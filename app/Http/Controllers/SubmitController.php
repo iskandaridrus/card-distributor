@@ -11,27 +11,32 @@ class SubmitController extends Controller
         $validated = $request->validate([
             'no_of_people' => 'required|integer|min:1',
         ]);
-
+        
         $shapes = array('S', 'H', 'D', 'C');
         $numbers = array('A', '2', '3', '4', '5', '6', '7', '8', '9', 'X', 'J', 'Q', 'K');
         $cards = array();
-
+        
         foreach($shapes as $shape) {
             foreach($numbers as $number) {
                 $cards[] = $shape."-".$number;
             }
         }
 
+        //shuffle cards
         $collection = collect($cards);
         $shuffled = $collection->shuffle();
         $shuffled->all();
 
+        // get number of people
         $no_of_people = $request->no_of_people;
         $cards_per_person = floor(count($shuffled) / $no_of_people);
-        if ($cards_per_person < 1)
-            $cards_per_person = 1;
-        $result = '';
 
+        if ($cards_per_person < 1) {
+            $cards_per_person = 1;
+        }
+
+        $result = '';
+        // distribute cards
         for($i = 0; $i < $no_of_people; $i++) {
             $result .= 'Person #'.($i + 1).' => ';
             for($j = $i * $cards_per_person; $j < ($i + 1) * $cards_per_person; $j++) {
